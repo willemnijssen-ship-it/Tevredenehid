@@ -58,12 +58,36 @@
             color: white; 
             font-weight: bold;
         }
-        /* De knop start nu als een normale knop (niet absoluut), dus ze staan netjes langs elkaar */
         .runaway-btn { 
             background-color: #dc3545; 
             color: white; 
             transition: all 0.25s ease-out; 
             z-index: 10;
+        }
+
+        /* Styling voor de gekantelde zwaartekracht-slider */
+        .slider-wrapper {
+            margin: 40px 0;
+            position: relative;
+        }
+        .gravity-slider {
+            width: 100%;
+            transform: rotate(5deg); /* Kantelt de balk optisch naar beneden richting 100% */
+            cursor: pointer;
+        }
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        #sliderValue {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -82,18 +106,34 @@
             </div>
         </div>
 
-        <!-- Vraag 2 -->
+        <!-- Vraag 2: NIEUW! Tevredenheid met Zwaartekracht -->
         <div class="step" id="step2">
-            <h2>Vraag 2: Wat wil je liever ontvangen?</h2>
-            <input type="hidden" name="Keuze" value="Bierpakket">
+            <h2>Vraag 2: Hoe tevreden ben je over de verhuurders geweest?</h2>
+            <div class="slider-wrapper">
+                <input type="range" id="gravitySlider" name="Tevredenheid" min="1" max="100" value="100" class="gravity-slider">
+                <div class="slider-labels">
+                    <span>1% 😡</span>
+                    <span>100% 😍</span>
+                </div>
+                <div id="sliderValue">100%</div>
+            </div>
             <div class="btn-container">
-                <button type="button" class="next-btn" onclick="nextStep(2, 3)">Bierpakket 🍺</button>
-                <button type="button" class="runaway-btn" id="runawayBtn">Wijnpakket 🍷</button>
+                <button type="button" class="next-btn" onclick="nextStep(2, 3)">Volgende</button>
             </div>
         </div>
 
         <!-- Vraag 3 -->
         <div class="step" id="step3">
+            <h2>Vraag 3: Wat wil je liever ontvangen?</h2>
+            <input type="hidden" name="Keuze" value="Bierpakket">
+            <div class="btn-container">
+                <button type="button" class="next-btn" onclick="nextStep(3, 4)">Bierpakket 🍺</button>
+                <button type="button" class="runaway-btn" id="runawayBtn">Wijnpakket 🍷</button>
+            </div>
+        </div>
+
+        <!-- Vraag 4 -->
+        <div class="step" id="step4">
             <h2>Klik hieronder om je keuze te bevestigen!</h2>
             <div class="btn-container">
                 <button type="submit" class="submit-btn">Verstuur Feedback</button>
@@ -116,10 +156,37 @@
         document.getElementById('step' + next).classList.add('active');
     }
 
+    // --- ZWAARTEKRACHT SLIDER LOGICA ---
+    const slider = document.getElementById('gravitySlider');
+    const sliderValue = document.getElementById('sliderValue');
+    let isUserDragging = false;
+
+    // Update tekst tijdens het slepen
+    slider.addEventListener('input', () => {
+        sliderValue.innerText = slider.value + '%';
+    });
+
+    slider.addEventListener('mousedown', () => { isUserDragging = true; });
+    slider.addEventListener('touchstart', () => { isUserDragging = true; });
+    slider.addEventListener('mouseup', () => { isUserDragging = false; });
+    slider.addEventListener('touchend', () => { isUserDragging = false; });
+
+    // Het zwaartekracht-effect (elke 16 milliseconden trekt de code de waarde terug naar 100)
+    setInterval(() => {
+        if (!isUserDragging && parseInt(slider.value) < 100) {
+            // Hoe verder de slider naar links staat, hoe groter de "valversnelling" terug naar rechts
+            let currentVal = parseInt(slider.value);
+            let speed = Math.ceil((100 - currentVal) * 0.15); 
+            slider.value = currentVal + speed;
+            sliderValue.innerText = slider.value + '%';
+        }
+    }, 16);
+
+
+    // --- WEGRENNENDE KNOP LOGICA ---
     const runawayBtn = document.getElementById('runawayBtn');
     
     function moveButton() {
-        // Zodra de muis in de buurt komt, zetten we de knop pas op 'absolute' zodat hij kan vliegen
         if (runawayBtn.style.position !== 'absolute') {
             runawayBtn.style.position = 'absolute';
         }
@@ -127,7 +194,6 @@
         const container = document.querySelector('.btn-container');
         const containerRect = container.getBoundingClientRect();
         
-        // Bereken een willekeurige plek binnen de containeromgeving
         const x = Math.random() * (containerRect.width - runawayBtn.offsetWidth);
         const y = (Math.random() * 260) - 130; 
         
