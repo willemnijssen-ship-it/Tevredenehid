@@ -39,6 +39,7 @@
         .btn-container {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 15px;
             margin-top: 20px;
             height: 60px;
@@ -50,18 +51,18 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            white-space: nowrap;
         }
         .next-btn, .submit-btn { 
             background-color: #28a745; 
             color: white; 
             font-weight: bold;
         }
-        /* De wegrennende knop heeft nu een 'transition' gekregen voor de vloeiende beweging */
+        /* De knop start nu als een normale knop (niet absoluut), dus ze staan netjes langs elkaar */
         .runaway-btn { 
             background-color: #dc3545; 
             color: white; 
-            position: absolute; 
-            transition: all 0.2s ease-out; 
+            transition: all 0.25s ease-out; 
             z-index: 10;
         }
     </style>
@@ -81,10 +82,9 @@
             </div>
         </div>
 
-        <!-- Vraag 2 (Aangepast naar bier/wijn) -->
+        <!-- Vraag 2 -->
         <div class="step" id="step2">
             <h2>Vraag 2: Wat wil je liever ontvangen?</h2>
-            <!-- Dit verborgen veld zorgt dat de keuze voor bierpakket wordt meegestuurd naar je mail -->
             <input type="hidden" name="Keuze" value="Bierpakket">
             <div class="btn-container">
                 <button type="button" class="next-btn" onclick="nextStep(2, 3)">Bierpakket 🍺</button>
@@ -92,7 +92,7 @@
             </div>
         </div>
 
-        <!-- Vraag 3 (Eindscherm) -->
+        <!-- Vraag 3 -->
         <div class="step" id="step3">
             <h2>Klik hieronder om je keuze te bevestigen!</h2>
             <div class="btn-container">
@@ -119,18 +119,22 @@
     const runawayBtn = document.getElementById('runawayBtn');
     
     function moveButton() {
+        // Zodra de muis in de buurt komt, zetten we de knop pas op 'absolute' zodat hij kan vliegen
+        if (runawayBtn.style.position !== 'absolute') {
+            runawayBtn.style.position = 'absolute';
+        }
+
         const container = document.querySelector('.btn-container');
         const containerRect = container.getBoundingClientRect();
         
-        // Zorgt dat hij vloeiend binnen of net buiten de container springt
+        // Bereken een willekeurige plek binnen de containeromgeving
         const x = Math.random() * (containerRect.width - runawayBtn.offsetWidth);
-        const y = (Math.random() * 250) - 125; 
+        const y = (Math.random() * 260) - 130; 
         
         runawayBtn.style.left = x + 'px';
         runawayBtn.style.top = y + 'px';
     }
 
-    // Luistert naar muis en touchscreen voor het vloeiende wegschieten
     runawayBtn.addEventListener('mouseenter', moveButton);
     runawayBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
