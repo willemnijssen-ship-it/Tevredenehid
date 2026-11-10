@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tevredenheid verhuurder opslag</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .quiz-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+        }
+        .step { display: none; }
+        .step.active { display: block; }
+        h2 { color: #333; margin-bottom: 20px; }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            height: 50px;
+            position: relative;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .next-btn, .submit-btn { background-color: #007bff; color: white; }
+        .runaway-btn { 
+            background-color: #dc3545; 
+            color: white; 
+            position: absolute; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <!-- VERANDER HIERONDER DE URL NAAR JE EIGEN FORMSPREE LINK -->
+    <form id="quizForm" action="https://formspree.io/f/mjyynzla" method="POST">
+        
+        <!-- Vraag 1 -->
+        <div class="step active" id="step1">
+            <h2>Vraag 1: Wat is je naam?</h2>
+            <input type="text" name="Naam" placeholder="Typ hier..." required>
+            <div class="btn-container">
+                <button type="button" class="next-btn" onclick="nextStep(1, 2)">Volgende</button>
+            </div>
+        </div>
+
+        <!-- Vraag 2 -->
+        <div class="step" id="step2">
+            <h2>Vraag 2: Heb je als bedankje liever een bier- of een wijnpakket?</h2>
+            <div class="btn-container">
+                <button type="button" class="next-btn" onclick="nextStep(2, 3)">Ja, absoluut</button>
+                <button type="button" class="runaway-btn" id="runawayBtn">Echt niet</button>
+            </div>
+        </div>
+
+        <!-- Vraag 3 (Eindscherm / Verzenden) -->
+        <div class="step" id="step3">
+            <h2>Klik hieronder om je antwoorden op te sturen!</h2>
+            <div class="btn-container">
+                <button type="submit" class="submit-btn">Verstuur Feedback</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // Functie om naar de volgende vraag te gaan
+    function nextStep(current, next) {
+        document.getElementById('step' + current).classList.remove('active');
+        document.getElementById('step' + next).classList.add('active');
+    }
+
+    // Het wegren-effect voor de knop op Vraag 2
+    const runawayBtn = document.getElementById('runawayBtn');
+    
+    function moveButton() {
+        // Genereer een willekeurige plek binnen de container (of het scherm)
+        const container = document.querySelector('.btn-container');
+        const containerRect = container.getBoundingClientRect();
+        
+        // Grenzen bepalen zodat de knop in de buurt blijft maar wegspringt
+        const x = Math.random() * (containerRect.width - runawayBtn.offsetWidth);
+        const y = (Math.random() * 200) - 100; // Beweegt ook omhoog of omlaag
+        
+        runawayBtn.style.left = x + 'px';
+        runawayBtn.style.top = y + 'px';
+    }
+
+    // Werkt voor zowel muis (desktop) als aanraking (mobiel)
+    runawayBtn.addEventListener('mouseenter', moveButton);
+    runawayBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Voorkomt dat er per ongeluk toch geklikt wordt op mobiel
+        moveButton();
+    });
+</script>
+
+</body>
+</html>
